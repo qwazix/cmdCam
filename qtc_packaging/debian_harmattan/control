@@ -1,0 +1,15 @@
+Source: cmdcam
+Section: user/multimedia
+Priority: optional
+Maintainer: Michael Demetriou <qwazix@gmail.com>
+Build-Depends: debhelper (>= 5), libqt4-dev
+#, libfcam-dev
+Standards-Version: 3.7.3
+Homepage: <insert the upstream URL, if relevant>
+
+Package: cmdcam
+Architecture: any
+Depends: fcam0 | fcam1, ${shlibs:Depends}, ${misc:Depends}
+Description: command line camera
+ <insert long description, indented with spaces>
+XSBC-Maemo-Display-Name: cmdCam
