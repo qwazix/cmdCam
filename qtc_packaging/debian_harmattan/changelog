@@ -1,3 +1,13 @@
+cmdcam (0.0.3) unstable; urgency=low
+  * Added image size argument
+
+ -- Michael Demetriou <qwazix@unknown>  Sun, 21 Apr 2013 22:30:17 +0300
+
+cmdcam (0.0.2) unstable; urgency=low
+  * Fixed focus bug
+
+ -- Michael Demetriou <qwazix@unknown>  Sun, 21 Apr 2013 22:01:47 +0300
+
 cmdcam (0.0.1) unstable; urgency=low
 
   * Initial Release.

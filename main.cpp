@@ -47,9 +47,11 @@ int main(int argc, char **argv) {
     int ISO = 100;
     int width = 2592;
     int height = 1968;
+    QString size = "L";
     float focus = -1.0f;
     bool flashon = false;
     bool soundon = true;
+    bool wide = false;
 
 
     QStringList arguments = a.arguments();
@@ -76,9 +78,14 @@ int main(int argc, char **argv) {
             whitebalance = arguments.at(i + 1).toInt();
             i++;
         } else if (parameter == "--focus") {
-            if (i + 1 >= arguments.count() || arguments.at(i + 1).toFloat() < 0.001 )
+            if (i + 1 >= arguments.count() || (arguments.at(i + 1).toFloat() < 0.001 && arguments.at(i + 1).toFloat() > -0.001))
                 qFatal("--focus requires a non-zero argument");
             focus = 1/arguments.at(i + 1).toFloat();
+            i++;
+        } else if (parameter == "--size") {
+            if (i + 1 >= arguments.count())
+                qFatal("--size requires an argument");
+            size = arguments.at(i + 1);
             i++;
         } else if (parameter == "--iso") {
             if (i + 1 >= arguments.count())
@@ -89,14 +96,17 @@ int main(int argc, char **argv) {
             flashon = true;
         } else if (parameter == "--nosound") {
             soundon = false;
+        } else if (parameter == "--wide") {
+            wide = true;
         } else if (parameter == "--help") {
             qDebug() << "qt command line camera";
-            qDebug() << "--path - path to save photos defaults to /home/user/MyDocs/DCIM/";
+            qDebug() << "--path - path to save photos. Defaults to /home/user/MyDocs/DCIM/";
             qDebug() << "         the path must exist";
             qDebug() << "--shutter - shutter time in μs";
             qDebug() << "--whitebalance - white balance in K";
-            qDebug() << "--focus - focus distance in m";
+            qDebug() << "--focus - focus distance in m, -1 for infinity (default)";
             qDebug() << "--flash - fire the flash";
+            qDebug() << "--size - image size, one of S, M, L, XL";
             qDebug() << "--nosound - disable clicking sound";
             exit(0);
         }
@@ -135,12 +145,25 @@ int main(int argc, char **argv) {
     shot1.exposure = shutter;
     shot1.gain = (float)ISO/100;
     shot1.whiteBalance = whitebalance;
-    shot1.image = FCam::Image(2592, 1968, FCam::UYVY);
-    lens.setFocus(std::max(lens.nearFocus(), focus) , lens.maxFocusSpeed());
+    if (size == "S"){
+        width =  816;
+        height = 608;
+    } else if (size == "M"){
+        width =  1632;
+        height = 1232;
+    } else if (size == "XL"){
+        width = 3264;
+        height = 2455;
+    }
+
+    shot1.image = FCam::Image(width, height, FCam::UYVY);
+
+    lens.setFocus(std::min(lens.nearFocus(), focus) , lens.maxFocusSpeed());
+    while (lens.focusChanging()) { ; }
 
     // Action (Flash)
     FCam::Flash::FireAction fire(&flash);
-    fire.duration = flash.minDuration();
+    fire.duration = flash.maxDuration();
     fire.time = 0;//shot1.exposure - fire.duration;
     fire.brightness = flash.maxBrightness();
 
